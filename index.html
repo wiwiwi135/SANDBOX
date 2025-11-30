@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GhostStream | Hamdy Sandbox</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --hacker-green: #00ff41;
+            --hacker-bg: #050505;
+            --panel-bg: #0d0d0d;
+            --border: #333;
+            --alert: #ff0055;
+        }
+
+        * { box-sizing: border-box; font-family: 'Consolas', 'Courier New', monospace; }
+
+        body {
+            background-color: var(--hacker-bg);
+            color: var(--hacker-green);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* توسيط عمودي */
+            padding: 20px;
+            background-image: linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* --- الحاوية الرئيسية --- */
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- 1. شريط العنوان --- */
+        .header {
+            border-bottom: 2px solid var(--hacker-green);
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .title { font-size: 1.5rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+        .status { font-size: 0.8rem; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- 2. وحدة التحكم (Input) --- */
+        .control-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--hacker-green);
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            background: #000;
+            border: 1px solid #333;
+            padding: 5px;
+            align-items: center;
+        }
+
+        .prompt { color: var(--hacker-green); font-weight: bold; padding-left: 10px; user-select: none; }
+        
+        input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 10px;
+            font-size: 1.1rem;
+            outline: none;
+            min-width: 0;
+        }
+
+        .btn-exec {
+            background: var(--hacker-green);
+            color: black;
+            border: none;
+            padding: 10px 25px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+        .btn-exec:hover { box-shadow: 0 0 15px var(--hacker-green); }
+
+        /* --- 3. الشاشة (Sandbox Viewport) --- */
+        .viewport {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border: 1px solid #333;
+            overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+        }
+        
+        .placeholder-text { color: #555; text-align: center; }
+        iframe { width: 100%; height: 100%; border: none; display: none; }
+
+        /* --- 4. لوحة التحليل --- */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+            height: 200px;
+        }
+
+        .terminal {
+            background: #080808;
+            border: 1px solid #333;
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            color: #ccc;
+        }
+        .log-line { margin-bottom: 5px; border-bottom: 1px solid #111; padding-bottom: 2px; }
+        .log-time { color: #555; margin-right: 10px; }
+        .log-succ { color: var(--hacker-green); }
+        .log-err { color: var(--alert); }
+
+        .metrics-box {
+            background: #111;
+            border: 1px solid #333;
+            padding: 15px;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .metric-val { font-size: 2rem; font-weight: bold; color: white; }
+        .metric-lbl { color: #777; font-size: 0.8rem; }
+
+        /* --- 5. توقيع عمك حمدي --- */
+        .footer-signature {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--hacker-green);
+            text-shadow: 0 0 15px var(--hacker-green);
+            letter-spacing: 2px;
+            font-family: 'Segoe UI', sans-serif; /* خط أوضح للعربي */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="title"><i class="fa-solid fa-box-open"></i> GHOST_SANDBOX</div>
+            <div class="status">● SECURE ENVIRONMENT</div>
+        </div>
+
+        <div class="control-panel">
+            <div class="input-wrapper">
+                <span class="prompt">root@hamdy:~$</span>
+                <input type="text" id="urlInput" placeholder="Paste Full URL (http:// or https://)..." onkeypress="if(event.keyCode==13) executeSequence()">
+                <button class="btn-exec" onclick="executeSequence()">OPEN SANDBOX</button>
+            </div>
+            <div id="errorMsg" style="color:var(--alert); font-size:0.9rem; margin-top:10px; display:none; font-weight:bold;"></div>
+        </div>
+
+        <div class="viewport" id="videoBox">
+            <div class="placeholder-text" id="idleState">
+                <i class="fa-solid fa-microchip fa-3x"></i><br><br>
+                READY TO ISOLATE TARGET...
+            </div>
+            <iframe id="mainFrame" sandbox="allow-scripts allow-same-origin allow-presentation allow-forms" allowfullscreen allow="autoplay"></iframe>
+        </div>
+
+        <div class="dashboard">
+            <div class="terminal" id="termLog">
+                <div class="log-line"><span class="log-time">SYSTEM</span> Sandbox Kernel Loaded. Waiting for input...</div>
+            </div>
+            <div class="metrics-box">
+                <div>
+                    <span class="metric-lbl">SECURITY LEVEL</span>
+                    <div class="metric-val" style="color:var(--hacker-green)">HIGH</div>
+                </div>
+                <div>
+                    <span class="metric-lbl">ISOLATION STATUS</span>
+                    <div class="metric-val" style="font-size:1.2rem;">ACTIVE</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-signature">
+            تصميم عمك حمدي
+        </div>
+    </div>
+
+    <script>
+        function executeSequence() {
+            const input = document.getElementById('urlInput');
+            const errorDiv = document.getElementById('errorMsg');
+            let url = input.value.trim();
+
+            errorDiv.style.display = 'none';
+
+            // 1. تحقق من وجود رابط
+            if (!url) {
+                showError("INPUT EMPTY: Please paste a link.");
+                return;
+            }
+
+            // 2. تحقق صارم (لازم يبدأ بـ http/https)
+            // شيلنا الإكمال التلقائي عشان يكون "روابط فقط"
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                showError("INVALID PROTOCOL: Link must start with 'http://' or 'https://'. Text is not allowed.");
+                return;
+            }
+
+            // بدء المحاكاة
+            startSandbox(url);
+        }
+
+        function showError(msg) {
+            const err = document.getElementById('errorMsg');
+            err.innerText = `>> DENIED: ${msg}`;
+            err.style.display = 'block';
+            addToLog(msg, 'err');
+        }
+
+        function startSandbox(url) {
+            const idle = document.getElementById('idleState');
+            const frame = document.getElementById('mainFrame');
+            
+            idle.innerHTML = '<i class="fa-solid fa-spinner fa-spin fa-3x"></i><br><br>INITIALIZING SANDBOX...';
+            frame.style.display = 'none';
+
+            // لوجات الهاكر
+            addToLog(`Target received: ${url.substring(0, 30)}...`);
+            setTimeout(() => addToLog("Isolating process in virtual container...", "succ"), 600);
+            setTimeout(() => addToLog("Applying security patches...", "succ"), 1200);
+            
+            setTimeout(() => {
+                let embedUrl = getEmbedUrl(url);
+                
+                idle.style.display = 'none';
+                frame.src = embedUrl;
+                frame.style.display = 'block';
+                addToLog("SANDBOX_ACTIVE: Content loaded successfully.", "succ");
+            }, 1800);
+        }
+
+        // دالة تحويل الروابط (عشان يوتيوب وغيره يشتغلوا Embed)
+        function getEmbedUrl(url) {
+            // يوتيوب
+            if (url.includes('youtu')) {
+                let id = url.match(/(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+                if (id && id[1]) return `https://www.youtube.com/embed/${id[1]}?autoplay=1`;
+            }
+            // فيميو
+            if (url.includes('vimeo')) {
+                let id = url.split('vimeo.com/')[1].split('/')[0];
+                return `https://player.vimeo.com/video/${id}?autoplay=1`;
+            }
+            // ديلي موشن
+            if (url.includes('dailymotion') || url.includes('dai.ly')) {
+                let id = url.split('/video/')[1]?.split('?')[0] || url.split('dai.ly/')[1];
+                if(id) return `https://www.dailymotion.com/embed/video/${id}?autoplay=1`;
+            }
+            // أي رابط تاني يفتحه زي ما هو (لو الموقع سمح)
+            return url;
+        }
+
+        function addToLog(msg, type='') {
+            const term = document.getElementById('termLog');
+            const div = document.createElement('div');
+            div.className = 'log-line';
+            const time = new Date().toLocaleTimeString('en-GB', {hour12: false});
+            
+            let colorClass = '';
+            if(type === 'succ') colorClass = 'log-succ';
+            if(type === 'err') colorClass = 'log-err';
+
+            div.innerHTML = `<span class="log-time">[${time}]</span> <span class="${colorClass}">${msg}</span>`;
+            term.appendChild(div);
+            term.scrollTop = term.scrollHeight;
+        }
+    </script>
+</body>
+  </html>
+                  
