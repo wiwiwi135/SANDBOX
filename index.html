@@ -1,3 +1,4 @@
+                  
 <!DOCTYPE html>
 <html lang="ar" dir="ltr">
 <head>
@@ -24,14 +25,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* توسيط عمودي */
+            justify-content: center;
             padding: 20px;
-            background-image: linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
-            background-size: 20px 20px;
+            background-image: radial-gradient(circle at 50% 50%, #111 0%, #000 70%);
         }
 
-        /* --- الحاوية الرئيسية --- */
         .container {
             width: 100%;
             max-width: 1000px;
@@ -40,7 +38,7 @@
             gap: 20px;
         }
 
-        /* --- 1. شريط العنوان --- */
+        /* --- الهيدر --- */
         .header {
             border-bottom: 2px solid var(--hacker-green);
             padding-bottom: 10px;
@@ -52,32 +50,33 @@
         .status { font-size: 0.8rem; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0; } }
 
-        /* --- 2. وحدة التحكم (Input) --- */
+        /* --- منطقة الإدخال --- */
         .control-panel {
             background: var(--panel-bg);
             border: 1px solid var(--hacker-green);
             padding: 20px;
             border-radius: 5px;
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
         }
 
         .input-wrapper {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             background: #000;
             border: 1px solid #333;
-            padding: 5px;
+            padding: 8px 15px;
             align-items: center;
+            border-radius: 4px;
         }
 
-        .prompt { color: var(--hacker-green); font-weight: bold; padding-left: 10px; user-select: none; }
+        .link-icon { color: var(--hacker-green); font-size: 1.2rem; }
         
         input {
             flex: 1;
             background: transparent;
             border: none;
             color: white;
-            padding: 10px;
+            padding: 10px 0;
             font-size: 1.1rem;
             outline: none;
             min-width: 0;
@@ -87,16 +86,16 @@
             background: var(--hacker-green);
             color: black;
             border: none;
-            padding: 10px 25px;
+            padding: 10px 30px;
             font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
-            flex-shrink: 0;
+            border-radius: 2px;
             white-space: nowrap;
         }
-        .btn-exec:hover { box-shadow: 0 0 15px var(--hacker-green); }
+        .btn-exec:hover { box-shadow: 0 0 15px var(--hacker-green); opacity: 0.9; }
 
-        /* --- 3. الشاشة (Sandbox Viewport) --- */
+        /* --- الشاشة (Sandbox) --- */
         .viewport {
             position: relative;
             width: 100%;
@@ -108,9 +107,10 @@
         }
         
         .placeholder-text { color: #555; text-align: center; }
-        iframe { width: 100%; height: 100%; border: none; display: none; }
+        /* جعلنا الإطار يملأ المكان بالكامل */
+        iframe { width: 100%; height: 100%; border: none; display: none; background: #fff; }
 
-        /* --- 4. لوحة التحليل --- */
+        /* --- اللوحة السفلية --- */
         .dashboard {
             display: grid;
             grid-template-columns: 2fr 1fr;
@@ -130,6 +130,7 @@
         .log-time { color: #555; margin-right: 10px; }
         .log-succ { color: var(--hacker-green); }
         .log-err { color: var(--alert); }
+        .log-warn { color: orange; }
 
         .metrics-box {
             background: #111;
@@ -140,16 +141,16 @@
         .metric-val { font-size: 2rem; font-weight: bold; color: white; }
         .metric-lbl { color: #777; font-size: 0.8rem; }
 
-        /* --- 5. توقيع عمك حمدي --- */
+        /* --- التوقيع --- */
         .footer-signature {
             text-align: center;
             margin-top: 30px;
             font-size: 1.5rem;
             font-weight: bold;
             color: var(--hacker-green);
-            text-shadow: 0 0 15px var(--hacker-green);
+            text-shadow: 0 0 10px var(--hacker-green);
             letter-spacing: 2px;
-            font-family: 'Segoe UI', sans-serif; /* خط أوضح للعربي */
+            font-family: 'Segoe UI', sans-serif;
         }
 
     </style>
@@ -158,39 +159,39 @@
 
     <div class="container">
         <div class="header">
-            <div class="title"><i class="fa-solid fa-box-open"></i> GHOST_SANDBOX</div>
-            <div class="status">● SECURE ENVIRONMENT</div>
+            <div class="title"><i class="fa-solid fa-microchip"></i> HAMDY_SANDBOX_V2</div>
+            <div class="status">● ACTIVE</div>
         </div>
 
         <div class="control-panel">
             <div class="input-wrapper">
-                <span class="prompt">root@hamdy:~$</span>
-                <input type="text" id="urlInput" placeholder="Paste Full URL (http:// or https://)..." onkeypress="if(event.keyCode==13) executeSequence()">
-                <button class="btn-exec" onclick="executeSequence()">OPEN SANDBOX</button>
+                <i class="fa-solid fa-link link-icon"></i>
+                <input type="text" id="urlInput" placeholder="http:// or https://..." onkeypress="if(event.keyCode==13) executeSequence()">
+                <button class="btn-exec" onclick="executeSequence()">RUN</button>
             </div>
             <div id="errorMsg" style="color:var(--alert); font-size:0.9rem; margin-top:10px; display:none; font-weight:bold;"></div>
         </div>
 
         <div class="viewport" id="videoBox">
             <div class="placeholder-text" id="idleState">
-                <i class="fa-solid fa-microchip fa-3x"></i><br><br>
-                READY TO ISOLATE TARGET...
+                <i class="fa-solid fa-box fa-3x"></i><br><br>
+                WAITING FOR URL...
             </div>
-            <iframe id="mainFrame" sandbox="allow-scripts allow-same-origin allow-presentation allow-forms" allowfullscreen allow="autoplay"></iframe>
+            <iframe id="mainFrame" sandbox="allow-scripts allow-same-origin allow-presentation allow-forms allow-popups allow-modals" allowfullscreen allow="autoplay"></iframe>
         </div>
 
         <div class="dashboard">
             <div class="terminal" id="termLog">
-                <div class="log-line"><span class="log-time">SYSTEM</span> Sandbox Kernel Loaded. Waiting for input...</div>
+                <div class="log-line"><span class="log-time">SYS</span> Kernel loaded. Security Level: MAXIMUM.</div>
             </div>
             <div class="metrics-box">
                 <div>
-                    <span class="metric-lbl">SECURITY LEVEL</span>
-                    <div class="metric-val" style="color:var(--hacker-green)">HIGH</div>
+                    <span class="metric-lbl">PROTOCOL</span>
+                    <div class="metric-val" id="protocolVal" style="color:var(--hacker-green)">--</div>
                 </div>
                 <div>
-                    <span class="metric-lbl">ISOLATION STATUS</span>
-                    <div class="metric-val" style="font-size:1.2rem;">ACTIVE</div>
+                    <span class="metric-lbl">STATUS</span>
+                    <div class="metric-val" id="statusVal" style="font-size:1.2rem;">IDLE</div>
                 </div>
             </div>
         </div>
@@ -208,26 +209,22 @@
 
             errorDiv.style.display = 'none';
 
-            // 1. تحقق من وجود رابط
             if (!url) {
-                showError("INPUT EMPTY: Please paste a link.");
+                showError("EMPTY INPUT");
                 return;
             }
 
-            // 2. تحقق صارم (لازم يبدأ بـ http/https)
-            // شيلنا الإكمال التلقائي عشان يكون "روابط فقط"
             if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                showError("INVALID PROTOCOL: Link must start with 'http://' or 'https://'. Text is not allowed.");
+                showError("PROTOCOL ERROR: URL must start with http:// or https://");
                 return;
             }
 
-            // بدء المحاكاة
             startSandbox(url);
         }
 
         function showError(msg) {
             const err = document.getElementById('errorMsg');
-            err.innerText = `>> DENIED: ${msg}`;
+            err.innerText = `>> ERROR: ${msg}`;
             err.style.display = 'block';
             addToLog(msg, 'err');
         }
@@ -235,44 +232,69 @@
         function startSandbox(url) {
             const idle = document.getElementById('idleState');
             const frame = document.getElementById('mainFrame');
-            
-            idle.innerHTML = '<i class="fa-solid fa-spinner fa-spin fa-3x"></i><br><br>INITIALIZING SANDBOX...';
-            frame.style.display = 'none';
+            const statusVal = document.getElementById('statusVal');
+            const protocolVal = document.getElementById('protocolVal');
 
-            // لوجات الهاكر
-            addToLog(`Target received: ${url.substring(0, 30)}...`);
-            setTimeout(() => addToLog("Isolating process in virtual container...", "succ"), 600);
-            setTimeout(() => addToLog("Applying security patches...", "succ"), 1200);
+            idle.innerHTML = '<i class="fa-solid fa-gear fa-spin fa-3x"></i><br><br>PROCESSING REQUEST...';
+            frame.style.display = 'none';
+            statusVal.innerText = "LOADING...";
+            statusVal.style.color = "orange";
+            protocolVal.innerText = url.startsWith('https') ? "HTTPS (SECURE)" : "HTTP (UNSAFE)";
+
+            addToLog(`Requesting access to: ${url.substring(0, 30)}...`);
             
+            // تحويل الرابط لصيغة Embed عشان يشتغل
+            let finalUrl = convertToEmbed(url);
+
+            if (finalUrl !== url) {
+                addToLog("Smart Converter: Converted to Embed format.", "succ");
+            } else {
+                addToLog("Warning: Direct link detected. Site may refuse connection.", "warn");
+            }
+
             setTimeout(() => {
-                let embedUrl = getEmbedUrl(url);
-                
                 idle.style.display = 'none';
-                frame.src = embedUrl;
+                frame.src = finalUrl;
                 frame.style.display = 'block';
-                addToLog("SANDBOX_ACTIVE: Content loaded successfully.", "succ");
-            }, 1800);
+                
+                statusVal.innerText = "RUNNING";
+                statusVal.style.color = "var(--hacker-green)";
+                addToLog("Sandbox Container Launched.", "succ");
+            }, 1000);
         }
 
-        // دالة تحويل الروابط (عشان يوتيوب وغيره يشتغلوا Embed)
-        function getEmbedUrl(url) {
-            // يوتيوب
-            if (url.includes('youtu')) {
-                let id = url.match(/(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+        // المحول الذكي: بيحل مشكلة الروابط اللي مش بتشتغل
+        function convertToEmbed(url) {
+            // YouTube (Shorts, Watch, Mobile)
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                let id = url.match(/(?:youtu\.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/);
                 if (id && id[1]) return `https://www.youtube.com/embed/${id[1]}?autoplay=1`;
             }
-            // فيميو
-            if (url.includes('vimeo')) {
+            
+            // Vimeo
+            if (url.includes('vimeo.com')) {
                 let id = url.split('vimeo.com/')[1].split('/')[0];
                 return `https://player.vimeo.com/video/${id}?autoplay=1`;
             }
-            // ديلي موشن
-            if (url.includes('dailymotion') || url.includes('dai.ly')) {
+            
+            // Dailymotion
+            if (url.includes('dailymotion.com') || url.includes('dai.ly')) {
                 let id = url.split('/video/')[1]?.split('?')[0] || url.split('dai.ly/')[1];
-                if(id) return `https://www.dailymotion.com/embed/video/${id}?autoplay=1`;
+                if (id) return `https://www.dailymotion.com/embed/video/${id}?autoplay=1`;
             }
-            // أي رابط تاني يفتحه زي ما هو (لو الموقع سمح)
-            return url;
+            
+            // Twitch
+            if (url.includes('twitch.tv')) {
+                let channel = url.split('twitch.tv/')[1];
+                return `https://player.twitch.tv/?channel=${channel}&parent=${window.location.hostname}`;
+            }
+
+            // لو الرابط فيديو مباشر (.mp4)
+            if (url.match(/\.(mp4|webm|ogg)$/i)) {
+                return url; // المتصفح هيشغله في المشغل بتاعه
+            }
+
+            return url; // رجع الرابط زي ما هو لو معرفناش نوعه (وحظك بقى مع حماية الموقع)
         }
 
         function addToLog(msg, type='') {
@@ -284,6 +306,7 @@
             let colorClass = '';
             if(type === 'succ') colorClass = 'log-succ';
             if(type === 'err') colorClass = 'log-err';
+            if(type === 'warn') colorClass = 'log-warn';
 
             div.innerHTML = `<span class="log-time">[${time}]</span> <span class="${colorClass}">${msg}</span>`;
             term.appendChild(div);
@@ -291,5 +314,4 @@
         }
     </script>
 </body>
-  </html>
-                  
+</html>
